@@ -3,5 +3,12 @@ WORKDIR /app
 COPY . .
 RUN npm ci --no-audit
 RUN timeout 300 node server.js --port 8000 || true
-RUN node -e "const y=require('js-yaml'),fs=require('fs');const c=y.load(fs.readFileSync('config.yaml','utf8'));c.listen=true;c.whitelistMode=false;c.basicAuthMode=true;if(!c.basicAuthUser)c.basicAuthUser={};c.basicAuthUser.username='nightstar';c.basicAuthUser.password='sy199713';fs.writeFileSync('config.yaml',y.dump(c));"
+RUN echo 'listen: true' > config.yaml && \
+    echo 'whitelistMode: false' >> config.yaml && \
+    echo 'basicAuthMode: true' >> config.yaml && \
+    echo 'basicAuthUser:' >> config.yaml && \
+    echo '  username: "nightstar"' >> config.yaml && \
+    echo '  password: "sy199713"' >> config.yaml && \
+    echo 'disableCsrfProtection: true' >> config.yaml && \
+    echo 'securityOverride: true' >> config.yaml
 CMD ["sh", "-c", "node server.js --port ${PORT:-8000} --skipBuild"]
